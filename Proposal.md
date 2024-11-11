@@ -36,11 +36,11 @@
 
    >예시
 <p align="center">
-  <img src="img\LogIn.png" alt="시작 화면 이미지" width="15%"/>
-  <img src="img\Main.png" alt="메인 화면 이미지" width="15%"/>
-  <img src="img\ContactNumber.png" alt="비상 연락망 화면 이미지" width="15%"/>
-  <img src="img\Message.png" alt="긴급 메시지 화면 이미지" width="15%"/>
-  <img src="img\Settings.png" alt="환경 설정 화면 이미지" width="15%"/>
+  <img src="img\LogIn.png" alt="시작 화면 이미지" width="18%" style="margin: 10px;"/>
+  <img src="img\Main.png" alt="메인 화면 이미지" width="18%" style="margin: 10px;"/>
+  <img src="img\ContactNumber.png" alt="비상 연락망 화면 이미지" width="18%" style="margin: 10px;"/>
+  <img src="img\Message.png" alt="긴급 메시지 화면 이미지" width="18%" style="margin: 10px;"/>
+  <img src="img\Settings.png" alt="환경 설정 화면 이미지" width="18%" style="margin: 10px;"/>
 </p>
 
 ### 3. **역할 분담**
