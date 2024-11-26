@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#D79911"
     android:orientation="vertical"
+    android:id="@+id/mainView"
     >
 
     <LinearLayout
@@ -47,7 +48,7 @@
             android:id="@+id/onOffBtn"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/on_off"/>
+            android:src="@drawable/on_btn"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
