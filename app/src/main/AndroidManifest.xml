@@ -23,10 +23,14 @@
         </activity>
         <!-- 회원가입 화면 -->
         <activity android:name=".SignUpActivity" />
+        <activity android:name=".ForgotPasswordActivity" />
 
         <!-- 메인 액티비티 -->
         <activity android:name=".MainActivity" />
-        <activity android:name=".ForgotPasswordActivity" />
+
+        <!--연락처 목록-->
+        <activity android:name=".ContactActivity" />
+
     </application>
 
 </manifest>
