@@ -3,10 +3,11 @@ x축y축z축의 가속도를 감지하고 총 가속도를 측정함
 
 1. 가속도(Accelation) 센서 --> 가속도를 측정
 
-    Acc_total = root{(Ax)^2 + (Ay)^2 + (Az)^2}
- 각속도(Gyroscope) 센서 --> 각속도의 측정  
+    Acc_total = sqrt{(Ax)^2 + (Ay)^2 + (Az)^2}
+ 
+   각속도(Gyroscope) 센서 --> 각속도의 측정  
 
-    Gcc_total = root{(Gx)^2 + (Gy)^2 + (Gz)^2}
+    Gcc_total = sqrt{(Gx)^2 + (Gy)^2 + (Gz)^2}
 
 2. 차 - 사람 충돌 가속도 계산
    
@@ -19,4 +20,32 @@ x축y축z축의 가속도를 감지하고 총 가속도를 측정함
 
 4. 변화량 감지 알고리즘 
 
-(일단 슈도코드 작성)
+(슈도코드)
+Input: A_x, A_y, A_z, G_x, G_y, G_z
+Constants: A_threshold = 83.9(계산 위 참고), G_threshold = (계산 필요)
+
+Variables:
+    CountA = 0 //사고 발생 횟수 변수
+    A_prev = 0 //가속도 변수 초기화
+    G_prev = 0 //각속도 변수 초기화
+
+Start:
+1. Loop while (센서 데이터 계속 받아옴):
+    2. Calculate A_current = sqrt(A_x^2 + A_y^2 + A_z^2)
+    3. Calculate G_current = sqrt(G_x^2 + G_y^2 + G_z^2)
+
+    4. If (A_current > A_prev):
+        5. CountA = CountA + 1
+    6. Else:
+        7. CountA = 0
+
+    4. If (G_current > G_prev):
+        5. CountG = CountG + 1
+    6. Else:
+        7. CountG = 0
+ 
+
+8. If (A_current > A_threshold OR G_current > G_threshold):
+    9. Print "충돌 발생!" 
+10. Else:
+    11. Print "충돌 없음"
