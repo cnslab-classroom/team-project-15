@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "279978719688",
+    "project_id": "opp-team-project",
+    "storage_bucket": "opp-team-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279978719688:android:c5ed9c56be32f9a512e8fd",
+        "android_client_info": {
+          "package_name": "com.team15.oppteamproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLUb769BXcgnW1y1HjdTIf4db0JCOxSbk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
