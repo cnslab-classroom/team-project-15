@@ -30,6 +30,10 @@
 
         <!--연락처 목록-->
         <activity android:name=".ContactActivity" />
+        <!--메시지 설정-->
+        <activity android:name=".MessageActivity" />
+        <!--환경 설정-->
+        <activity android:name=".SettingActivity" />
 
     </application>
 

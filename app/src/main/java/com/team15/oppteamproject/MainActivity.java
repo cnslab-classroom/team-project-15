@@ -47,6 +47,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        messageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, MessageActivity.class));
+                finish();
+            }
+        });
+
+        settingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, SettingActivity.class));
+                finish();
+            }
+        });
+
         // 활성화/비활성화 버튼 클릭 이벤트
         onoffBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
                 saveState();
             }
         });
+
+
     }
 
     // UI 업데이트 메서드
