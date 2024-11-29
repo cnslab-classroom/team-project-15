@@ -10,6 +10,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,11 +29,15 @@ public class ContactActivity extends AppCompatActivity {
     private TextView editBtn;
     private List<Contact> contacts;
     private ContactAdapter adapter;
+    private DatabaseReference database;  // Firebase Database 참조
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
+
+        // Firebase Database 참조 초기화
+        database = FirebaseDatabase.getInstance().getReference();
 
         // View 초기화
         preBtn = findViewById(R.id.previousBtn);
@@ -36,11 +47,11 @@ public class ContactActivity extends AppCompatActivity {
         // ListView 및 Adapter 초기화
         ListView contactListView = findViewById(R.id.contactList);
         contacts = new ArrayList<>();
-        contacts.add(new Contact("홍길동", "010-1234-5678"));
-        contacts.add(new Contact("이몽룡", "010-8765-4321"));
-
         adapter = new ContactAdapter(this, contacts);
         contactListView.setAdapter(adapter);
+
+        // Firebase에서 데이터 읽기
+        loadContactsFromFirebase();
 
         // 플러스 버튼 클릭 이벤트
         plusBtn.setOnClickListener(new View.OnClickListener() {
@@ -56,6 +67,32 @@ public class ContactActivity extends AppCompatActivity {
             public void onClick(View view) {
                 startActivity(new Intent(ContactActivity.this, MainActivity.class));
                 finish();
+            }
+        });
+    }
+
+    // Firebase에서 연락처 목록 읽어오기
+    private void loadContactsFromFirebase() {
+        // contacts 노드에 데이터를 추가합니다.
+        database.child("contacts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // 기존 연락처 목록 초기화
+                contacts.clear();
+
+                // Firebase에서 데이터를 읽어서 contacts 리스트에 추가
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Contact contact = snapshot.getValue(Contact.class);
+                    contacts.add(contact);  // 연락처 추가
+                }
+
+                // 데이터가 변경될 때마다 어댑터를 갱신
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ContactActivity.this, "데이터 읽기 실패: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -92,6 +129,9 @@ public class ContactActivity extends AppCompatActivity {
                 return;
             }
 
+            // Firebase에 연락처 저장
+            saveContactToFirebase(name, phone);
+
             // 리스트에 추가
             contacts.add(new Contact(name, phone));
             adapter.notifyDataSetChanged(); // 리스트 갱신
@@ -100,5 +140,24 @@ public class ContactActivity extends AppCompatActivity {
         });
 
         dialog.show(); // 다이얼로그 표시
+    }
+
+    // Firebase에 연락처 저장
+    private void saveContactToFirebase(String name, String phone) {
+        // 고유 ID 생성
+        String contactId = database.push().getKey();  // 새로운 고유 ID 생성
+
+        if (contactId != null) {
+            // Firebase에 데이터 저장
+            Contact contact = new Contact(name, phone);
+            database.child("contacts").child(contactId).setValue(contact)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(ContactActivity.this, "연락처가 Firebase에 저장되었습니다.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ContactActivity.this, "저장 실패: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 }
