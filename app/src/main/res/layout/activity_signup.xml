@@ -21,7 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="이메일 인증"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#D79911"
+        android:padding="16dp" />
 
     <!-- 이메일 인증 확인 버튼 -->
     <Button
@@ -30,7 +32,9 @@
         android:layout_height="wrap_content"
         android:text="이메일 인증 확인"
         android:layout_marginTop="16dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:backgroundTint="#D79911"
+        android:padding="16dp" />
 
     <!-- 비밀번호 입력 필드 -->
     <EditText
@@ -61,6 +65,8 @@
         android:layout_height="wrap_content"
         android:text="회원가입"
         android:layout_marginTop="16dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:backgroundTint="#D79911"
+        android:padding="16dp" />
 
 </LinearLayout>

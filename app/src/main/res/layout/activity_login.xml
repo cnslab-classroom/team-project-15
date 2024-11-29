@@ -5,73 +5,86 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="36dp"
     android:background="#FFFFFF">
-
-    <!-- 아이디 입력 필드 -->
-    <EditText
-        android:id="@+id/emailEditText"
+    
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center"
+        android:src="@drawable/cover"/>
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="아이디"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <!-- 아이디 입력 필드 -->
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
 
-        android:drawablePadding="12dp"
-        android:backgroundTint="#CCCCCC"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"
-        android:inputType="textEmailAddress"
-        android:background="@drawable/rounded_edittext_background" />
+            android:textSize="14dp"
+            android:hint="아이디"
+            android:padding="16dp"
+            android:backgroundTint="#E3E4E5"
+            android:inputType="textEmailAddress"
+             />
 
-    <!-- 비밀번호 입력 필드 -->
-    <EditText
-        android:id="@+id/passwordEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="비밀번호"
+        <!-- 비밀번호 입력 필드 -->
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
 
-        android:drawablePadding="12dp"
-        android:backgroundTint="#CCCCCC"
-        android:padding="16dp"
-        android:layout_marginBottom="24dp"
-        android:inputType="textPassword"
-        android:background="@drawable/rounded_edittext_background" />
-
-    <!-- 로그인 버튼 -->
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="로그인"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#FFC107"
-        android:textColor="#FFFFFF"
-        android:padding="16dp"
-        android:textStyle="bold"
-         />
-
-    <!-- 회원가입 버튼 -->
+            android:hint="비밀번호"
+            android:inputType="textPassword"
+            android:backgroundTint="#E3E4E5"
+            android:padding="16dp"
+            android:textSize="14dp" />
 
 
-    <!-- 비밀번호 찾기 -->
-    <Button
-        android:id="@+id/signUpButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        <!-- 로그인 버튼 -->
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
 
-        android:backgroundTint="#ffffff"
-        android:padding="16dp"
-        android:text="회원가입"
-        android:textColor="#000000"
-        app:strokeColor="#000000"
-        app:strokeWidth="1dp" />
+            android:backgroundTint="#D79911"
+            android:padding="16dp"
+            android:text="로그인"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/forgotPasswordText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="비밀번호 찾기 >"
-        android:textColor="#757575"
-        android:layout_gravity="center_horizontal" />
+        <!-- 회원가입 버튼 -->
+        <Button
+            android:id="@+id/signUpButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+
+            android:backgroundTint="#ffffff"
+            android:padding="16dp"
+            android:text="회원가입"
+            android:textColor="#111111"
+            app:strokeColor="#E3E4E5"
+            app:strokeWidth="1dp" />
+
+        <!-- 비밀번호 찾기 -->
+        <TextView
+            android:id="@+id/forgotPasswordText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="비밀번호 찾기 >"
+            android:textColor="#ACACAC"
+            android:textSize="14dp"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
 </LinearLayout>
 

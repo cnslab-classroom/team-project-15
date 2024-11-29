@@ -1,0 +1,12 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- 원형 배경 색상 (10% 투명도 검은색) -->
+    <solid android:color="#1A000000" />
+
+    <!-- 크기 조정 -->
+    <size
+        android:width="100dp"
+        android:height="100dp" />
+
+</shape>
