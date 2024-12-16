@@ -22,4 +22,20 @@
         android:textSize="18sp"
         android:layout_marginBottom="20dp"/>
 
+    <TextView
+        android:id="@+id/tv_collision"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="충돌 상태: 감지되지 않음"
+        android:textSize="18sp"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:id="@+id/tv_fall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="낙하 상태: 감지되지 않음"
+        android:textSize="18sp"
+        android:layout_marginBottom="20dp"/>
+
 </LinearLayout>
