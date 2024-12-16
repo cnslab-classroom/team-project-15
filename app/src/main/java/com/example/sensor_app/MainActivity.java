@@ -16,28 +16,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor accelerometer;
     private Sensor gyroscope;
 
-    private TextView tvAccelerometer, tvGyroscope, tvCollision, tvFall;
+    private TextView tvAccelerometer, tvGyroscope;
 
-    // 감지 변수
-    private int crash_detected = 0; // 충돌 감지 변수
-    private int fall_detected = 0;  // 낙하 감지 변수
-
-    // 충돌 및 낙하 임계값
-    private static final float COLLISION_THRESHOLD = 83.9f; // 충돌 기준
-    private static final float FALL_THRESHOLD = 0.2f;       // 낙하 기준
+    // 충돌 및 의식 상실 감지 변수
+    private boolean crashDetected = false;
+    private boolean unconsciousDetected = false;
+    private boolean checkingUnconscious = false;
+    private long unconsciousStartTime = 0L; // 10.5 이하 상태가 시작된 시간 기록용
+    private static final float CRASH_THRESHOLD = 83.9f;
+    private static final float UNCONSCIOUS_THRESHOLD = 10.5f;
+    private static final long UNCONSCIOUS_DURATION = 10_000L; // 10초(10000ms)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TextView 초기화
         tvAccelerometer = findViewById(R.id.tv_accelerometer);
         tvGyroscope = findViewById(R.id.tv_gyroscope);
-        tvCollision = findViewById(R.id.tv_collision);
-        tvFall = findViewById(R.id.tv_fall);
 
-        // SensorManager 초기화
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -65,59 +62,64 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
-        // 센서 리스너 해제
         sensorManager.unregisterListener(this);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            // 가속도 데이터 처리
-            float ax = event.values[0];
-            float ay = event.values[1];
-            float az = event.values[2];
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
 
-            // 가속도의 크기 계산
-            double acc_total = Math.sqrt(ax * ax + ay * ay + az * az);
+            // Root값 계산
+            double rootValue = Math.sqrt(x*x + y*y + z*z);
 
-            // 가속도 데이터 표시
-            tvAccelerometer.setText(String.format("가속도 센서: X=%.2f, Y=%.2f, Z=%.2f, Total=%.2f", ax, ay, az, acc_total));
-
-            // 충돌 감지
-            if (acc_total > COLLISION_THRESHOLD) {
-                crash_detected = 1;
-                tvCollision.setText("충돌 감지됨!");
-            } else {
-                crash_detected = 0;
-                tvCollision.setText("충돌 감지되지 않음");
+            // 충돌 감지 로직
+            if (!crashDetected && rootValue > CRASH_THRESHOLD) {
+                crashDetected = true;
+                // 여기서 crashDetected를 1로 표현하려면 별도의 int 변수 사용 가능
+                // int crashStatus = 1;
             }
 
-            // 낙하 감지
-            if (Math.abs(ax) <= FALL_THRESHOLD && Math.abs(ay) <= FALL_THRESHOLD && Math.abs(az) <= FALL_THRESHOLD) {
-                fall_detected = 1;
-                tvFall.setText("낙하 감지됨!");
-            } else {
-                fall_detected = 0;
-                tvFall.setText("낙하 감지되지 않음");
+            // 충돌 감지 이후 의식 상실 감지 로직
+            if (crashDetected && !unconsciousDetected) {
+                if (rootValue <= UNCONSCIOUS_THRESHOLD) {
+                    // 만약 아직 체크 시작 전이면 시작 시간 기록
+                    if (!checkingUnconscious) {
+                        checkingUnconscious = true;
+                        unconsciousStartTime = System.currentTimeMillis();
+                    } else {
+                        // 이미 체크 중이라면 현재 시간이 시작 시간으로부터 10초 이상 지났는지 확인
+                        long elapsed = System.currentTimeMillis() - unconsciousStartTime;
+                        if (elapsed >= UNCONSCIOUS_DURATION) {
+                            unconsciousDetected = true;
+                            // 여기서 unconsciousDetected를 1로 표현하려면 별도의 int 변수 사용 가능
+                            // int unconsciousStatus = 1;
+                        }
+                    }
+                } else {
+                    // 10.5 이하 유지 못하면 다시 초기화
+                    checkingUnconscious = false;
+                }
             }
+
+            String accText = String.format("가속도 센서: X = %.2f, Y = %.2f, Z = %.2f\nroot=%.2f\ncrashDetected=%b\nunconsciousDetected=%b",
+                    x, y, z, rootValue, crashDetected, unconsciousDetected);
+            tvAccelerometer.setText(accText);
         }
 
         if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-
-            float gx = event.values[0];
-            float gy = event.values[1];
-            float gz = event.values[2];
-
-            // 각속도의 크기 계산
-            double gcc_total = Math.sqrt(gx * gx + gy * gy + gz * gz);
-
-            // 자이로 데이터 표시
-            tvGyroscope.setText(String.format("자이로 센서: X=%.2f, Y=%.2f, Z=%.2f, Total=%.2f", gx, gy, gz, gcc_total));
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+            String gyroText = String.format("자이로 센서: X = %.2f, Y = %.2f, Z = %.2f", x, y, z);
+            tvGyroscope.setText(gyroText);
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // 정확도 변경 처리 (필요시 구현)
+        // 정확도 변경 시 필요시 구현
     }
 }
