@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 체크된 상태 -->
+    <item android:state_checked="false">
+        <shape android:shape="oval">
+            <solid android:color="#ffffff" />
+            <stroke android:width="3dp" android:color="#E3E4E5" />
+        </shape>
+    </item>
+
+    <!-- 기본 상태 -->
+    <item android:state_checked="true">
+        <layer-list>
+            <item>
+                <solid android:color="#E3E4E5" />
+            </item>
+            <item android:drawable="@drawable/checkbox_bg"/>
+        </layer-list>
+    </item>
+</selector>
