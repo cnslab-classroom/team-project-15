@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -78,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button testButton = findViewById(R.id.testButton);
+        testButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, GPSTestActivity.class);
+            startActivity(intent);
+        });
 
     }
 
@@ -108,4 +114,6 @@ public class MainActivity extends AppCompatActivity {
         // 액티비티 종료 전에 상태 저장
         saveState();
     }
+
+
 }

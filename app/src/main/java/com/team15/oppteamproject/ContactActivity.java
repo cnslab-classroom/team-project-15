@@ -3,6 +3,7 @@ package com.team15.oppteamproject;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -72,22 +74,49 @@ public class ContactActivity extends AppCompatActivity {
     }
 
     // Firebase에서 연락처 목록 읽어오기
+/*private void loadContactsFromFirebase() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid(); // 현재 로그인한 사용자 ID
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference("contacts");
+
+        database.child(userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult().exists()) {
+                    for (DataSnapshot contactSnapshot : task.getResult().getChildren()) {
+                        String name = contactSnapshot.child("name").getValue(String.class);
+                        String phone = contactSnapshot.child("phone").getValue(String.class);
+
+                        // 로그로 출력 (테스트용)
+                        Log.d("Contact", "Name: " + name + ", Phone: " + phone);
+                    }
+                } else {
+                    Toast.makeText(ContactActivity.this, "연락처가 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(ContactActivity.this, "연락처 불러오기 실패: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }*/
     private void loadContactsFromFirebase() {
-        // contacts 노드에 데이터를 추가합니다.
-        database.child("contacts").addValueEventListener(new ValueEventListener() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid(); // 로그인한 사용자의 UID 가져오기
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference("contacts");
+
+        // UID를 기준으로 해당 사용자의 연락처 데이터만 가져오기
+        database.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // 기존 연락처 목록 초기화
-                contacts.clear();
+                contacts.clear(); // 기존 데이터를 초기화
 
                 // Firebase에서 데이터를 읽어서 contacts 리스트에 추가
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Contact contact = snapshot.getValue(Contact.class);
-                    contacts.add(contact);  // 연락처 추가
+                    if (contact != null) {
+                        contacts.add(contact); // 리스트에 추가
+                    }
                 }
 
-                // 데이터가 변경될 때마다 어댑터를 갱신
-                adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged(); // 리스트 갱신
             }
 
             @Override
@@ -96,6 +125,8 @@ public class ContactActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     // 다이얼로그 생성 및 표시
     private void showAddContactDialog() {
@@ -144,13 +175,17 @@ public class ContactActivity extends AppCompatActivity {
 
     // Firebase에 연락처 저장
     private void saveContactToFirebase(String name, String phone) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid(); // 현재 로그인한 사용자 ID 가져오기
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference("contacts");
+
         // 고유 ID 생성
-        String contactId = database.push().getKey();  // 새로운 고유 ID 생성
+        String contactId = database.child(userId).push().getKey(); // 사용자 ID 하위에 고유 ID 생성
 
         if (contactId != null) {
             // Firebase에 데이터 저장
             Contact contact = new Contact(name, phone);
-            database.child("contacts").child(contactId).setValue(contact)
+            database.child(userId).child(contactId).setValue(contact)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(ContactActivity.this, "연락처가 Firebase에 저장되었습니다.", Toast.LENGTH_SHORT).show();
@@ -160,4 +195,5 @@ public class ContactActivity extends AppCompatActivity {
                     });
         }
     }
+
 }
