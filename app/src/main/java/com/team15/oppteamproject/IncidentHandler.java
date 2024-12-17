@@ -45,7 +45,7 @@ public class IncidentHandler implements SensorEventListener {
 
     // 가속도 값 비교용 변수
     private static final long CHECK_INTERVAL = 1000; // 1초 간격 (밀리초)
-    private static final double CRASH_THRESHOLD_DIFF = 5.0; // 충돌 감지 가속도 차이 임계값
+    private static final double CRASH_THRESHOLD_DIFF = 80.0; // 충돌 감지 가속도 차이 임계값
     private float previousAcceleration = 0.0f; // 이전 가속도 값
     private long lastUpdateTime = 0L; // 마지막 업데이트 시간
     private static final String CHANNEL_ID = "incident_channel";
