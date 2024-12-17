@@ -1,6 +1,7 @@
 package com.team15.oppteamproject;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -44,7 +45,7 @@ public class IncidentHandler implements SensorEventListener {
 
     // 가속도 값 비교용 변수
     private static final long CHECK_INTERVAL = 1000; // 1초 간격 (밀리초)
-    private static final double CRASH_THRESHOLD_DIFF = 80.0; // 충돌 감지 가속도 차이 임계값
+    private static final double CRASH_THRESHOLD_DIFF = 5.0; // 충돌 감지 가속도 차이 임계값
     private float previousAcceleration = 0.0f; // 이전 가속도 값
     private long lastUpdateTime = 0L; // 마지막 업데이트 시간
     private static final String CHANNEL_ID = "incident_channel";
@@ -262,28 +263,101 @@ public class IncidentHandler implements SensorEventListener {
             Log.d("IncidentHandler", "GPS tracking stopped.");
         }
     }
+    private boolean checkSMSPermission() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (context instanceof Activity) {
+                ActivityCompat.requestPermissions((Activity) context,
+                        new String[]{Manifest.permission.SEND_SMS}, 1);
+            } else {
+                Log.e("IncidentHandler", "Context is not an instance of Activity. Cannot request permission.");
+            }
+            return false;
+        }
+        return true;
+    }
+    private boolean checkAndRequestSMSPermission(Activity activity) {
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.SEND_SMS}, 1);
+            return false;
+        }
+        return true;
+    }
 
-    // Firebase에서 비상 연락망 불러오기 및 메시지 전송
-    private void sendEmergencyMessages() {
+
+    // Firebase에서 최초 GPS 정보 가져오기 및 SMS 전송
+    private void getFirstGPSAndSendSMS() {
+        DatabaseReference gpsRef = incidentsRef.child(incidentId).child("locations");
+        gpsRef.limitToFirst(1).get().addOnSuccessListener(dataSnapshot -> {
+            if (dataSnapshot.exists()) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Double latitude = snapshot.child("latitude").getValue(Double.class);
+                    Double longitude = snapshot.child("longitude").getValue(Double.class);
+
+                    if (latitude != null && longitude != null) {
+                        String gpsInfo = "위치: https://maps.google.com/?q=" + latitude + "," + longitude;
+                        sendEmergencyMessagesWithGPS(gpsInfo);
+                    }
+                }
+            } else {
+                Log.e("IncidentHandler", "No GPS data found.");
+            }
+        }).addOnFailureListener(e -> Log.e("IncidentHandler", "Failed to fetch GPS data: ", e));
+    }
+
+    // GPS 정보를 포함한 SMS 전송 메서드
+    private void sendEmergencyMessagesWithGPS(String gpsInfo) {
+        if (!checkSMSPermission()) {
+            Log.e("IncidentHandler", "SMS permission not granted.");
+            return;
+        }
+
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         contactsRef.child(userId).get().addOnSuccessListener(dataSnapshot -> {
             List<String> failedContacts = new ArrayList<>();
             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                 String phoneNumber = snapshot.child("phone").getValue(String.class);
                 String name = snapshot.child("name").getValue(String.class);
+
                 if (phoneNumber != null && name != null) {
-                    boolean success = sendSMS(phoneNumber, name);
+                    boolean success = sendSMS(phoneNumber, name, gpsInfo);
                     if (!success) failedContacts.add(phoneNumber);
                 }
             }
 
             if (failedContacts.isEmpty()) {
-                Log.d("IncidentHandler", "All emergency messages sent successfully.");
+                Log.d("IncidentHandler", "All emergency messages sent successfully with GPS.");
             } else {
                 Log.e("IncidentHandler", "Failed to send SMS to: " + failedContacts);
             }
         });
     }
+
+    // GPS 정보를 포함하여 SMS 전송
+    private boolean sendSMS(String phoneNumber, String name, String gpsInfo) {
+        String message = "안녕하세요, " + name + "님. 긴급 상황 발생!\n" +
+                "사용자의 상태를 확인해 주세요.\n" + gpsInfo;
+
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+            Log.d("IncidentHandler", "SMS sent to: " + phoneNumber);
+            return true;
+        } catch (Exception e) {
+            Log.e("IncidentHandler", "SMS failed to: " + phoneNumber, e);
+            return false;
+        }
+    }
+
+    // 기존 sendEmergencyMessages에서 GPS 데이터 사용
+    private void sendEmergencyMessages() {
+        if (incidentId != null) {
+            getFirstGPSAndSendSMS();
+        } else {
+            Log.e("IncidentHandler", "Incident ID is null. Cannot fetch GPS data.");
+        }
+    }
+
 
     // SMS 전송
     private boolean sendSMS(String phoneNumber, String name) {
