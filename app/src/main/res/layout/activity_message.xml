@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -5,8 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#ffffff"
-    android:padding="18dp"
-    >
+    android:padding="18dp">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -57,20 +58,19 @@
     </RelativeLayout>
 
     <EditText
+        android:id="@+id/messageEditText"
         android:layout_width="match_parent"
         android:layout_height="230dp"
         android:layout_marginRight="6dp"
         android:layout_marginLeft="6dp"
         android:background="@drawable/rounded_outline_button_background"
         android:singleLine="false"
-
         android:padding="16dp"
         android:gravity="start"
         android:text="현재 핸드폰 소지자가 사고로 인해 위급한 상태입니다. 확인 전화 부탁드립니다."
         android:textColor="#111111"
         android:textSize="16dp" />
 
-    <!--목록 구분 선-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp">
@@ -81,15 +81,18 @@
             android:background="#E3E4E5"/>
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <ListView
+        android:id="@+id/contactList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/sendMessageButton"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginLeft="6dp"
-        android:text="연락처별 메시지 설정"
-        android:textSize="18dp"
-        android:textStyle="bold"/>
-
-
+        android:text="메시지 보내기"
+        android:layout_marginTop="16dp"/>
 
 </LinearLayout>

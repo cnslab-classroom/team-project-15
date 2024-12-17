@@ -113,7 +113,7 @@ public class ContactActivity extends AppCompatActivity {
                     Contact contact = snapshot.getValue(Contact.class);
                     if (contact != null) {
                         contacts.add(contact); // 리스트에 추가
-                    }
+                     }
                 }
 
                 adapter.notifyDataSetChanged(); // 리스트 갱신

@@ -1,0 +1,30 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#ffffff"
+    android:padding="24dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="비밀번호 재설정"
+        android:textSize="16dp"
+        android:textColor="#111111"
+        android:textStyle="bold"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="#ACACAC"
+        android:layout_margin="16dp"
+        android:text="비밀번호 재설정을 위해 이메일 주소를 입력해주세요"/>
+    <EditText
+        android:id="@+id/editEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14dp"
+        android:padding="16dp"
+        android:hint="이메일 입력" />
+
+
+</LinearLayout>

@@ -1,4 +1,4 @@
-package com.team15.oppteamproject;
+/*package com.team15.oppteamproject;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -158,4 +158,4 @@ public class GPSTestActivity extends AppCompatActivity {
             Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
         }
     }
-}
+}*/

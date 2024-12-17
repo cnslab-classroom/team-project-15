@@ -31,6 +31,11 @@
             android:layout_height="wrap_content"
             app:cornerRadius="10dp" />
     </LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"
+        android:id="@+id/testbtn"/>
 
     <RelativeLayout
         android:layout_marginTop="50dp"
@@ -39,7 +44,8 @@
         >
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="-20dp"
             android:layout_marginTop="50dp"
             android:background="@drawable/main_background" />
         <ImageView
@@ -104,15 +110,20 @@
             android:layout_below="@+id/messageBtn"
             android:layout_centerHorizontal="true"
             />
-        <Button
+
+       <!-- <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/testButton"
             android:text="gps test"/>
-
-
-
-
+-->
+        <TextView
+            android:id="@+id/tv_accelerometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="가속도 센서 값"
+            android:textSize="16sp"
+            android:layout_margin="16dp"/>
 
     </RelativeLayout>
 
