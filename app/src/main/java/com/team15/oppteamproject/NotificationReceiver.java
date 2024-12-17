@@ -14,6 +14,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             if (incidentHandler != null) {
                 incidentHandler.resetCrashState();
                 incidentHandler.stopMonitoring();
+                incidentHandler.stopSound(); // 소리 중지
                 Log.d("NotificationReceiver", "User confirmed consciousness. Crash state reset.");
             } else {
                 Log.e("NotificationReceiver", "IncidentHandler instance is null.");

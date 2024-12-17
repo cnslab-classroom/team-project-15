@@ -36,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (incidentHandler != null) {
+            incidentHandler.stopSound(); // 소리 중지
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -125,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 알림 권한 확인 및 요청
-    private void checkNotificationPermission() {
+    public void checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {

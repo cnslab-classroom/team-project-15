@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -39,6 +40,13 @@ import java.util.concurrent.TimeUnit;
 
 public class IncidentHandler implements SensorEventListener {
 
+    private MediaPlayer mediaPlayer; // MP3 파일 재생용
+
+    // 가속도 값 비교용 변수
+    private static final long CHECK_INTERVAL = 1000; // 1초 간격 (밀리초)
+    private static final double CRASH_THRESHOLD_DIFF = 80.0; // 충돌 감지 가속도 차이 임계값
+    private float previousAcceleration = 0.0f; // 이전 가속도 값
+    private long lastUpdateTime = 0L; // 마지막 업데이트 시간
     private static final String CHANNEL_ID = "incident_channel";
     private static final float CRASH_THRESHOLD = 15f;
     private static final float UNCONSCIOUS_THRESHOLD = 10.5f;
@@ -82,6 +90,26 @@ public class IncidentHandler implements SensorEventListener {
         createNotificationChannel();
 
     }
+
+    private void playSound() {
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(context, R.raw.beep); // res/raw/beep.mp3 사용
+            mediaPlayer.setLooping(true); // 반복 재생
+            mediaPlayer.start();
+        }
+    }
+
+
+    public void stopSound() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
+
+
     public void cleanup() {
         if (notificationReceiver != null) {
             context.unregisterReceiver(notificationReceiver);
@@ -273,6 +301,9 @@ public class IncidentHandler implements SensorEventListener {
 
     // 알림 생성
     private void showNotification(String title, String content) {
+
+        playSound();
+
         Intent broadcastIntent = new Intent(context, NotificationReceiver.class);
         broadcastIntent.setAction("ACTION_CONSCIOUS_CONFIRMED");
 
@@ -302,7 +333,7 @@ public class IncidentHandler implements SensorEventListener {
             unconsciousStartTime = 0L; // 의식 상실 타이머 초기화
             messagesSent = false; // 메시지 전송 상태 리셋
             stopGPSTracking(); // GPS 추적 중단
-
+            stopSound(); // 소리 중지
             Log.d("IncidentHandler", "Crash state reset. All pending actions stopped.");
         }
     }
@@ -348,49 +379,56 @@ public class IncidentHandler implements SensorEventListener {
             float y = event.values[1];
             float z = event.values[2];
 
-            double rootValue = Math.sqrt(x * x + y * y + z * z);
+            // 현재 시간 및 가속도 값 계산
+            long currentTime = System.currentTimeMillis();
+            double currentAcceleration = Math.sqrt(x * x + y * y + z * z);
 
-            String accText = String.format("Root=%.2f, CrashDetected=%b, UnconsciousDetected=%b",
-                    rootValue, crashDetected, unconsciousDetected);
-            tvAccelerometer.setText(accText);
+            // 1초 단위로 가속도 비교
+            if ((currentTime - lastUpdateTime) > CHECK_INTERVAL) {
+                double accelerationDifference = Math.abs(currentAcceleration - previousAcceleration);
 
-            // 충돌 감지 로직
-            if (!crashDetected && rootValue > CRASH_THRESHOLD) {
-                crashDetected = true;
-                startIncidentHandling();
-                startGPSTracking(incidentId);
-                checkNotificationPermission();
-                showNotification("충돌 감지됨", "사용자의 상태를 확인하세요.");
-            }
+                // 충돌 감지 조건: 가속도 차이가 CRASH_THRESHOLD_DIFF 이상일 때
+                if (!crashDetected && accelerationDifference >= CRASH_THRESHOLD_DIFF) {
+                    crashDetected = true;
+                    startIncidentHandling();
+                    startGPSTracking(incidentId);
+                    checkNotificationPermission();
+                    showNotification("충돌 감지됨", "사용자의 상태를 확인하세요.");
+                    Log.d("IncidentHandler", "Crash detected! Acceleration difference: " + accelerationDifference);
+                }
 
-            // 의식 상실 감지 로직
-            if (crashDetected && rootValue <= UNCONSCIOUS_THRESHOLD) {
-                if (!checkingUnconscious) {
-                    checkingUnconscious = true;
-                    unconsciousStartTime = System.currentTimeMillis();
-                } else if (System.currentTimeMillis() - unconsciousStartTime >= UNCONSCIOUS_DURATION) {
-                    if (!unconsciousDetected) { // 의식 상실 상태를 처음 감지한 경우
-                        unconsciousDetected = true;
+                // 의식 상실 감지 로직
+                if (crashDetected && currentAcceleration <= UNCONSCIOUS_THRESHOLD) {
+                    if (!checkingUnconscious) {
+                        checkingUnconscious = true;
+                        unconsciousStartTime = currentTime;
+                    } else if (currentTime - unconsciousStartTime >= UNCONSCIOUS_DURATION) {
+                        if (!unconsciousDetected) {
+                            unconsciousDetected = true;
 
-                        if (!messagesSent) { // 메시지가 아직 전송되지 않은 경우에만 실행
-                            sendEmergencyMessages();
-                            showNotification("의식 상실 감지됨", "비상 연락망에 메시지를 전송했습니다.");
-                            messagesSent = true; // 메시지 전송 상태를 true로 설정
+                            if (!messagesSent) {
+                                sendEmergencyMessages();
+                                showNotification("의식 상실 감지됨", "비상 연락망에 메시지를 전송했습니다.");
+                                messagesSent = true;
+                            }
                         }
                     }
+                } else {
+                    checkingUnconscious = false; // 의식이 확인되면 초기화
                 }
-            } else {
-                checkingUnconscious = false;
+
+                // 이전 가속도 및 시간 업데이트
+                previousAcceleration = (float) currentAcceleration;
+                lastUpdateTime = currentTime;
+
+                // 로그 출력 및 UI 업데이트
+                String accText = String.format("Current=%.2f, Prev=%.2f, Diff=%.2f, Crash=%b, Unconscious=%b",
+                        currentAcceleration, previousAcceleration, accelerationDifference, crashDetected, unconsciousDetected);
+                tvAccelerometer.setText(accText);
             }
         }
-        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
-            String gyroText = String.format("자이로 센서: X = %.2f, Y = %.2f, Z = %.2f", x, y, z);
-            Log.d("IncidentHandler", gyroText);
-        }
     }
+
 
 
     @Override

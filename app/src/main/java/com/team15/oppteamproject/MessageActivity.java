@@ -3,11 +3,14 @@ package com.team15.oppteamproject;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -23,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageActivity extends AppCompatActivity {
-
+    ImageButton prebtn;
     private ListView contactList;
     private ContactAdapter adapter;
     private List<Contact> contacts;
@@ -49,6 +52,17 @@ public class MessageActivity extends AppCompatActivity {
         contactsRef = FirebaseDatabase.getInstance().getReference("contacts");
 
         loadContacts();
+        prebtn = findViewById(R.id.previousBtn);
+        prebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // MainActivity로 돌아가기 위한 Intent 생성
+                Intent intent = new Intent(MessageActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                finish(); // 현재 액티비티 종료
+            }
+        });
 
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +71,8 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     private void loadContacts() {
         isLoading = true;
